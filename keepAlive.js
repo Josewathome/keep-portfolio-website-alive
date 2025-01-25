@@ -3,7 +3,7 @@ const cron = require('node-cron');
 const express = require('express'); // Add Express for serving HTML and data
 
 const app = express();
-const websiteUrl = 'https://joseph-g-wathome.vercel.app/';
+const websiteUrl = 'https://joseph-g-wathome.vercel.app/projects';
 
 // Variables to store ping times
 let lastPingTime = null;
