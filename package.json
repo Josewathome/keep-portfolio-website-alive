@@ -1,25 +1,26 @@
 {
-    "name": "keep-alive-website",
-    "version": "1.0.0",
-    "description": "A script to keep a website alive by pinging it periodically.",
-    "main": "keepAlive.js",
-    "scripts": {
-      "start": "node keepAlive.js",
-      "dev": "node keepAlive.js"
-    },
-    "dependencies": {
-      "axios": "^1.6.2",
-      "node-cron": "^3.0.2"
-    },
-    "engines": {
-      "node": ">=16.x"
-    },
-    "keywords": [
-      "keep-alive",
-      "website",
-      "vercel",
-      "nodejs"
-    ],
+  "name": "keep-alive-website",
+  "version": "1.0.0",
+  "description": "A script to keep a website alive by pinging it periodically.",
+  "main": "keepAlive.js",
+  "scripts": {
+    "start": "node keepAlive.js",
+    "dev": "node keepAlive.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "node-cron": "^3.0.2",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=16.x"
+  },
+  "keywords": [
+    "keep-alive",
+    "website",
+    "vercel",
+    "nodejs"
+  ],
     "author": "Joseph Wathome",
     "license": "MIT"
 }
