@@ -19,3 +19,8 @@ cron.schedule('0 0 */24 * * *', () => {
 });
 
 console.log('Keep-alive script is running...');
+
+// Export a handler function for Vercel
+module.exports = (req, res) => {
+    res.status(200).send('Keep-alive script is running in the background.');
+};

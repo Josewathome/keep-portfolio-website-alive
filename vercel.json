@@ -1,15 +1,15 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "keepAlive.js",
-        "use": "@vercel/node"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "keepAlive.js"
-      }
-    ]
-  }
+  "version": 2,
+  "builds": [
+    {
+      "src": "keepAlive.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "keepAlive.js"
+    }
+  ]
+}
