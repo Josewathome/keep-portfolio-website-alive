@@ -1,50 +1,87 @@
 const axios = require('axios');
 const cron = require('node-cron');
-const express = require('express'); // Add Express for serving HTML and data
+const express = require('express');
+const fs = require('fs');
 
 const app = express();
-const websiteUrl = 'https://joseph-g-wathome.vercel.app/projects';
+const dataFile = 'data.json';
 
-// Variables to store ping times
+// List of URLs to scrape and ping
+const urls = [
+    'https://joseph-g-wathome.vercel.app/projects',
+    'https://joseph-g-wathome.vercel.app/experiences/5c006d7b-50c0-490c-a8cb-1bc75a18d358',  // Add more URLs here
+];
+
 let lastPingTime = null;
-let nextPingTime = null;
+let nextPingTime = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
-// Function to ping the website
-const pingWebsite = async () => {
-    try {
-        const response = await axios.get(websiteUrl);
-        lastPingTime = new Date().toISOString();
-        console.log(`Website pinged successfully at ${lastPingTime}`);
-    } catch (error) {
-        console.error(`Error pinging website: ${error.message}`);
+// Function to scrape data from URLs
+const scrapeData = async () => {
+    let scrapedData = [];
+
+    for (const url of urls) {
+        try {
+            console.log(`Scraping: ${url}`);
+            const response = await axios.get(url);
+            scrapedData.push({ url, data: response.data });
+        } catch (error) {
+            console.error(`Error scraping ${url}: ${error.message}`);
+        }
+    }
+
+    // Store new data and overwrite existing data.json
+    fs.writeFileSync(dataFile, JSON.stringify(scrapedData, null, 2));
+    console.log('Scraped data saved to data.json');
+};
+
+// Function to ping the websites
+const pingWebsites = async () => {
+    for (const url of urls) {
+        try {
+            await axios.get(url);
+            lastPingTime = new Date().toISOString();
+            console.log(`Successfully pinged: ${url} at ${lastPingTime}`);
+        } catch (error) {
+            console.error(`Error pinging ${url}: ${error.message}`);
+        }
     }
 };
 
-// Schedule the task to run every 24 hours
-cron.schedule('0 0 */24 * * *', () => {
-    pingWebsite();
-    nextPingTime = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(); // Set next ping time
+// Schedule scraping and pinging every 24 hours
+cron.schedule('0 0 */24 * * *', async () => {
+    console.log('Running scheduled task...');
+    await scrapeData();
+    await pingWebsites();
+    nextPingTime = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 });
 
-// Initialize next ping time
-nextPingTime = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-
-// Serve the index.html file
+// Serve index.html
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
 });
 
-// Endpoint to get ping data
+// Serve scraped data
+app.get('/scraped-data', (req, res) => {
+    if (fs.existsSync(dataFile)) {
+        res.sendFile(__dirname + `/${dataFile}`);
+    } else {
+        res.json({ message: 'No data available. Scraping may not have run yet.' });
+    }
+});
+
+// Serve ping status
 app.get('/ping-data', (req, res) => {
     res.json({
         lastPingTime,
         nextPingTime,
-        status: 'Keep-alive script is running in the background.'
+        status: 'Scraping and pinging script is running.'
     });
 });
 
 // Start the server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`Server is running on port ${PORT}`);
+    await scrapeData();  // Run scraping immediately on startup
+    await pingWebsites();
 });
